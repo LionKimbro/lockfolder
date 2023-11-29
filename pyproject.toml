@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "lockfolder"
-version = "1.0.0"
+version = "1.0.1"
 
 authors = [
   { name="Lion Kimbro", email="lionkimbro@gmail.com" },
@@ -12,7 +12,7 @@ authors = [
 
 description = "check-bid-check into a lock folder, to obtain a lock"
 
-readme = "README.txt"
+readme = "README.md"
 
 requires-python = ">=3.7"
 

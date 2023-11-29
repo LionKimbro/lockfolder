@@ -1,28 +1,71 @@
-## Lock Folder -- README.md
-written: 2023-11-29
+# Lock Folder
 
 #### Project Summary
+
 > check-bid-check into a lock folder, to obtain a lock
 
 #### Installation
 
-"pip install lockfolder"
+pip install lockfolder
 
-## Concept
-
-_The following description is copied from https://www.reddit.com/r/AskProgramming/comments/186ot93/is_this_checkbidcheck_mutex_strategy_okay/ , where I described this project to Reddit._
+### How to Use It
 
 
-I'm writing a mutex system, that I intend to publish to PyPI, and I want to make sure it's right.  But I know that these things can be tricky, so I want to check if anybody can identify important flaws with my strategy.
+```
+import pathlib
+from lockfolder import lockfolder
 
-### Goals:
+lockfolder.init()
 
-* it never fails, if a lock is granted and all procedures and promises are kept
-   * failure in the event of v4 GUID collision is acceptable
-* **live-locks are acceptable**
-   * (undestood to be, in crudly expressed terms: "so many things are going for the resource, and they are fighting so intensely, that nobody gets to have the resource")
-* security and file permissions are NOT concerns
-* it works on any system with a conventional filesystem and conventional process identification (PIDs, & create-time for processes available)
+p = pathlib.Path("path/to/lockfolder")
+
+if lockfolder.lock(p):
+    print("aquired lock")
+    ...
+    ...
+    lockfolder.unlock(p)
+else:
+    print("failed to aquire lock")
+```
+
+Adapt to context manager, throw-finally systems, decorator, what have
+you, as you like.
+
+
+### Lock Files
+
+Lock files are JSON files that are logically equivalent to:
+
+```
+----------[ filename: <GUID>.json ]-----------------------------------
+  {
+    "PID": <integer PID>,
+    "CREATED": <integer timestamp>
+  }
+----------------------------------------------------------------------
+```
+
+
+### Concept
+
+This is a mutex system, that ensures that only one process has access to a resource.
+
+It's defining features are:
+* a filesystem folder is used to bid for a lock
+* it is cross-platform to contemporary operating systems
+* it's very simple
+* it has only one external dependency: `psutil`
+* it is robust to recycled PIDs
+
+Some of the limitations of this system, are:
+* live-locks are possible, which occurs when too many processes all try to get a lock at the same time
+   * all petitioners will fail to achieve a lock
+   * insistent petitioners should repeat efforts at connection with an exponential backoff
+* security and file permissions are not taken account of
+   * it is possible for a malicious user or process to manually delete or create lock files
+* there is an extremely unlikely possibility of a v4 GUID collision
+* PID recycling fails if the same PID is recycled to a competitor within the second (highly unusual) 
+
 
 ### Basic Strategy:
 
@@ -34,6 +77,7 @@ I'm writing a mutex system, that I intend to publish to PyPI, and I want to make
 * if the "check-bid-check" passes, then the bid is left until the process completes, at which point the bid is deleted
 * bids contain the process PID and creation time of the process, and may be deleted by any process that wishes to challenge a prior bid, provided that it can determine that a process created at <create-time> with process ID <PID> is no longer running
 * upon a fail, at the programmer's discretion, processes may delay and retry, with delays having a random component, and increasing duration between attempts
+
 
 ### Procedure:
 
@@ -56,44 +100,10 @@ STEP 50. **OPERATE** -- the lock has been acquired (it's the same file as the bi
 
 STEP 60. **DELETE & END** -- delete the bid file that was created in step 20, then END (error state: SUCCESS)
 
-### Verification:
 
-My belief is that this procedure should work.
+### Additional Resources
 
-Here's why:
+* https://www.reddit.com/r/AskProgramming/comments/186ot93/is_this_checkbidcheck_mutex_strategy_okay/ -- a Reddit thread, in which I requested verification of correctness for this system.
 
-A reference BID (step 20) is completed at time (t1), followed by a CHECK (step 30) initiated at time (t2).
+written: 2023-11-29
 
-A competing BID is completed in one of three possible time frames:
-
-1. before (t1)
-2. after (t1), before (t2)
-3. after (t2)
-
-Now we can look at each possible scenario for the competing CHECK.
-
-CASE 1. BID completes before (t1)
-* CASE 1.A. CHECK initiated before (t1)
-* CASE 1.B. CHECK initiated after (t1), before (t2)
-* CASE 1.C. CHECK initiated after (t2)
-
-CASE 2. BID completes after (t1), before (t2)
-* CASE 2.A. CHECK initiated after (t1), before (t2)
-* CASE 2.B. CHECK initiated after (t2)
-
-CASE 3. BID completes after (t2)
-* CASE 3.A. CHECK  - initiated after (t2)
-
-In every case, it can be manually verified that the code logic will prevent dual-assignment of the lock.
-
-* 1.A, B, and C: the reference CHECK will detect two bids, and withdraw its bid (OK)
-* 2.A, B: the reference CHECK will detect two bids, and withdraw its bid (OK)
-* 3.A: the competing CHECK will detect two bids, and withdraw its bid (OK)
-
-So it seems to me like this should always work.  But I'm only a lay-person at the examination of this logic, and I think there may be important factors that I'm not aware of.
-
-Do you see any problems with this mutex strategy?
-
-* Perhaps there's something tricky about filesystem caching that I am not aware of?
-* Perhaps there's some timing issue that I have not properly understood?
-* Perhaps my math is wrong?

@@ -12,6 +12,8 @@ authors = [
 
 description = "check-bid-check into a lock folder, to obtain a lock"
 
+keywords = ["mutex", "lock", "locking", "guid"]
+
 readme = "README.md"
 
 requires-python = ">=3.7"

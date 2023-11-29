@@ -1,12 +1,12 @@
 # Lock Folder
 
-#### Project Summary
-
-> check-bid-check into a lock folder, to obtain a lock
+Obtain a lock by posting a bid into a lock folder, and checking for rivals.
 
 #### Installation
 
+```
 pip install lockfolder
+```
 
 ### How to Use It
 
@@ -87,10 +87,10 @@ STEP 10. **CHECK** -- check the lock folder for the presence of any files; if th
 
 STEP 20. **BID** -- write a file into the lock folder, containing the following, then proceed to step 30
 
-* filename: "<self-selected-GUID-for-this-process>.json"
+* filename: `(self-selected-GUID-for-this-process).json`
 * JSON file content:
-   * PID: <process-id>
-   * PROCESS-START-TIME: <timestamp-for-this-process>
+   * PID: `(process-id)`
+   * PROCESS-START-TIME: `(timestamp-for-this-process)`
 
 STEP 30. **CHECK** -- check the lock folder for the presence of any files, other than my own: if there are other files, proceed to step 40, otherwise, proceed to step 50
 

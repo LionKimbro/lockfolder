@@ -1,0 +1,12 @@
+{
+  "FACTORY2023V2": {
+    "PROJTYPE": "PYPACKAGE"
+  },
+  "EXPORT-IMPORT": {
+    "WORKINGDIR": [{"OBJECT": "FOLDER",
+                    "SRC": "src/lockfolder",
+                    "DEST": "lockfolder",
+                    "POLICY": "REPLACE"}]
+  }
+}
+    

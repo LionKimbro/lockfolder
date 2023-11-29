@@ -1,0 +1,18 @@
+{
+  "ID": {
+    "GUID": "0244fbad-8ed9-4590-b876-86f66be0a4d9",
+    "TAGURI": "lionkimbro@gmail.com,2023-11-29:project:lockfolder",
+    "NAME": "lockfolder"
+  },
+  "INFO": {
+    "TITLE": "Lock Folder",
+    "DESC": "check-bid-check into a lock folder, to obtain a lock",
+    "TAGS": ["python", "lock", "locking", "mutex", "check", "bid", "guid"]
+  },
+  "TIMESTAMPS": {
+    "START_TEXT": "2023-11-29",
+    "START": 1701265244,
+    "CREATED": 1701265244
+  }
+}
+

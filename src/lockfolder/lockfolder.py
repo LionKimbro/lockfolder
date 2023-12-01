@@ -125,7 +125,7 @@ CREATED = "CREATED"
 g = {}
 
 
-def init():
+def setup():
     g[UUID] = str(uuid.uuid4())
     g[PID] = os.getpid()
     g[CREATED] = int(psutil.Process(g[PID]).create_time())
@@ -153,6 +153,21 @@ def lock(lockfolder_path):
 
     return True
 
+
+def in_use(lockfolder_path):
+    """Return True if any non-stale competing bid is present."""
+    return not _check(lockfolder_path)
+
+def have_lock(lockfolder_path):
+    """Return True if I have the lock.
+    
+    This curious procedure simply checks if my bidfile is in the
+    directory.  Since it's impossible to leave the lock(...) routine
+    with the bidfile remaining, unless it was completely obtained, and
+    there is nothing else that places the bidfile in there, this
+    routine works.
+    """
+    return _bidfile_path(lockfolder_path).exists()
 
 def unlock(lockfolder_path):
     """Release a lock in folder p."""

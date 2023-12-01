@@ -11,7 +11,7 @@ setup(
     name='lockfolder',
     long_description=long_description,
     long_description_content_type='text/markdown',
-    version='1.0.1',
+    version='1.0.2',
     author="Lion Kimbro",
     author_email='lionkimbro@gmail.com',
     packages=find_packages('src'),
